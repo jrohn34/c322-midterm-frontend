@@ -116,6 +116,9 @@
           const data = await response.json();
           const correctAnswer = data.answer;
 
+        // Log the correct answer and user's answer for debugging
+          console.log(`Question ${i + 1} - Correct Answer: ${correctAnswer}, User's Answer: ${userAnswers[i]}`);
+
           // Retrieve the user's answer for the current question
           const userAnswer = userAnswers[i];
           if (userAnswer && arraysEqual(userAnswer, correctAnswer)) {
