@@ -3,127 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
+    <title>Take a Quiz</title>
     <style>
-        /* Style for quiz questions */
-        .quiz-question {
+        /* Style for quiz boxes */
+        .quiz-box {
             border: 2px solid #ccc;
             padding: 10px;
             margin-bottom: 10px;
+            cursor: pointer;
         }
 
-        /* Style for navigation buttons */
-        .nav-buttons {
-            margin-top: 10px;
-        }
-
-        /* Style for hidden element */
-        .hidden {
-            display: none;
+        /* Style for quiz info */
+        .quiz-info {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h2 id="quizTitle">Quiz Title</h2>
+    <h2>Here are the list of all available quizzes. Click on a quiz to start taking the quiz.</h2>
 
-    <div id="quizContainer">
-        <!-- Quiz questions will be dynamically added here -->
-    </div>
-
-    <div id="navigation" class="nav-buttons">
-        <!-- Navigation buttons will be dynamically added here -->
+    <div id="quizList">
+        <!-- Quiz boxes will be dynamically added here -->
     </div>
 
     <script>
-        let quizData; // Global variable to store quiz data
-        let currentQuestionIndex = 0;
+        // Function to fetch and display quizzes
+        async function displayQuizzes() {
+            // Fetch available quizzes from backend API
+            const response = await fetch('http://localhost:8080/quizzes');
+            const quizzes = await response.json();
 
-        // Function to fetch quiz data from backend
-        async function fetchQuizData() {
-            const quizId = new URLSearchParams(window.location.search).get('id');
-            const response = await fetch(`http://localhost:8080/quizzes/${quizId}`);
-            if (response.ok) {
-                quizData = await response.json();
-                displayQuizTitle();
-                displayQuestion();
-                displayNavigation();
-            } else {
-                console.error('Failed to fetch quiz data');
-            }
+            // Display each quiz as a clickable box
+            const quizList = document.getElementById('quizList');
+            quizzes.forEach(quiz => {
+                const quizBox = document.createElement('div');
+                quizBox.classList.add('quiz-box');
+                quizBox.innerHTML = `
+                    <div class="quiz-info">
+                        <p>Quiz ID: ${quiz.id}</p>
+                        <p>Title: ${quiz.title}</p>
+                        <p>Number of Questions: ${quiz.questions.length}</p>
+                    </div>
+                `;
+                quizBox.addEventListener('click', () => {
+                    // Redirect to quiz page with quiz ID as parameter
+                    window.location.href = `quiz.html?id=${quiz.id}`;
+                });
+                quizList.appendChild(quizBox);
+            });
         }
 
-        // Function to display quiz title
-        function displayQuizTitle() {
-            document.getElementById('quizTitle').textContent = quizData.title;
-        }
-
-        // Function to display quiz questions
-        function displayQuestion() {
-            const quizContainer = document.getElementById('quizContainer');
-            quizContainer.innerHTML = '';
-
-            const questionData = quizData.questions[currentQuestionIndex];
-            const questionDiv = document.createElement('div');
-            questionDiv.classList.add('quiz-question');
-            questionDiv.innerHTML = `
-                <p>${questionData.description}</p>
-                <ul>
-                    ${questionData.choices.map((choice, index) => `<li><input type="radio" name="answer" value="${choice}">${choice}</li>`).join('')}
-                </ul>
-            `;
-            quizContainer.appendChild(questionDiv);
-        }
-
-        // Function to display navigation buttons
-        function displayNavigation() {
-            const navigation = document.getElementById('navigation');
-            navigation.innerHTML = '';
-
-            const prevButton = document.createElement('button');
-            prevButton.textContent = 'Previous';
-            prevButton.onclick = () => {
-                currentQuestionIndex--;
-                displayQuestion();
-                displayNavigation();
-            };
-
-            const nextButton = document.createElement('button');
-            nextButton.textContent = 'Next';
-            nextButton.onclick = () => {
-                const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-                if (!selectedAnswer) {
-                    alert('Please select an answer.');
-                    return;
-                }
-                currentQuestionIndex++;
-                if (currentQuestionIndex === quizData.questions.length) {
-                    displayScore();
-                } else {
-                    displayQuestion();
-                    displayNavigation();
-                }
-            };
-
-            navigation.appendChild(prevButton);
-            navigation.appendChild(nextButton);
-
-            // Hide previous button if on first question
-            prevButton.style.display = currentQuestionIndex === 0 ? 'none' : 'inline-block';
-
-            // Hide navigation buttons if on last question
-            nextButton.style.display = currentQuestionIndex === quizData.questions.length - 1 ? 'none' : 'inline-block';
-        }
-
-        // Function to calculate and display quiz score
-        function displayScore() {
-            // You can calculate and display the quiz score here
-            alert('Quiz completed!'); // Replace this with your score calculation
-            // Show top menu again
-            // Replace this with your code to show the top menu
-        }
-
-        // Fetch quiz data when the page loads
-        window.onload = fetchQuizData;
+        // Call the displayQuizzes function when the page loads
+        window.onload = displayQuizzes;
     </script>
 </body>
 </html>
