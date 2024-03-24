@@ -7,88 +7,61 @@
 </head>
 <body>
     <h1>Make a Quiz</h1>
-
     <form id="quizForm">
         <label for="quizTitle">Quiz Title:</label><br>
         <input type="text" id="quizTitle" name="quizTitle" required><br><br>
 
         <div id="questionCheckboxes">
-            <!-- Question checkboxes with image, ID, options, and answers -->
         </div><br>
 
         <input type="button" value="Create Quiz" onclick="createQuiz()">
     </form>
 
     <script>
-        // Function to fetch questions from backend and populate the checkboxes
         async function populateQuestions() {
-            // Fetch questions from backend API
             const response = await fetch('http://localhost:8080/questions');
             const questions = await response.json();
-
-            // Populate the checkboxes with questions
             const questionCheckboxes = document.getElementById('questionCheckboxes');
             questions.forEach(question => {
-                // Create a container for each question
                 const questionContainer = document.createElement('div');
-
-                // Add image
                 const image = document.createElement('img');
                 image.src = `http://localhost:8080/questions/${question.id}/image`;
                 image.alt = 'Question Image';
                 image.style.width = '100px';
                 questionContainer.appendChild(image);
-
-                // Add question ID
                 const idLabel = document.createElement('label');
                 idLabel.textContent = `ID: ${question.id}`;
                 questionContainer.appendChild(idLabel);
                 questionContainer.appendChild(document.createElement('br'));
-
-                // Add question description
                 const descriptionLabel = document.createElement('label');
                 descriptionLabel.textContent = question.description;
                 questionContainer.appendChild(descriptionLabel);
                 questionContainer.appendChild(document.createElement('br'));
-
-                // Add options
                 question.choices.forEach((choice, index) => {
                     const optionLabel = document.createElement('label');
                     optionLabel.textContent = `${String.fromCharCode(65 + index)}. ${choice}`;
                     questionContainer.appendChild(optionLabel);
                     questionContainer.appendChild(document.createElement('br'));
                 });
-
-                // Add answer
                 const answerLabel = document.createElement('label');
                 answerLabel.textContent = `Answer: ${question.answer}`;
                 questionContainer.appendChild(answerLabel);
                 questionContainer.appendChild(document.createElement('br'));
-
-                // Create checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = 'selectedQuestions';
                 checkbox.value = JSON.stringify({ id: question.id, answer: question.answer }); // Include both ID and answer
                 questionContainer.appendChild(checkbox);
-
-                // Append question container to main container
                 questionCheckboxes.appendChild(questionContainer);
                 questionCheckboxes.appendChild(document.createElement('hr'));
             });
         }
-
-        // Function to create a quiz
         async function createQuiz() {
             const quizTitle = document.getElementById('quizTitle').value;
             const selectedQuestions = Array.from(document.querySelectorAll('input[name="selectedQuestions"]:checked'))
                 .map(checkbox => JSON.parse(checkbox.value)); // Parse the JSON string
-
-            // Extract question IDs and answers
             const questionIds = selectedQuestions.map(question => question.id);
             const answers = selectedQuestions.map(question => question.answer);
-
-            // Send the quiz data to backend to create the quiz
             const response = await fetch('http://localhost:8080/quizzes', {
                 method: 'POST',
                 headers: {
@@ -97,10 +70,9 @@
                 body: JSON.stringify({
                     title: quizTitle,
                     questionIds: questionIds,
-                    answers: answers // Include answers in the request body
+                    answers: answers 
                 })
             });
-
             if (response.ok) {
                 alert('Quiz created successfully!');
                 document.getElementById('quizForm').reset();
@@ -108,8 +80,6 @@
                 alert('Failed to create quiz');
             }
         }
-
-        // Call the populateQuestions function when the page loads
         window.onload = populateQuestions;
     </script>
 </body>

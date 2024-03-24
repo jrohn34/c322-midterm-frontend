@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Take a Quiz</title>
     <style>
-        /* Style for quiz boxes */
         .quiz-box {
             border: 2px solid #ccc;
             padding: 10px;
@@ -13,7 +12,6 @@
             cursor: pointer;
         }
 
-        /* Style for quiz info */
         .quiz-info {
             font-weight: bold;
         }
@@ -23,17 +21,13 @@
     <h2>Here are the list of all available quizzes. Click on a quiz to start taking the quiz.</h2>
 
     <div id="quizList">
-        <!-- Quiz boxes will be dynamically added here -->
     </div>
 
     <script>
-        // Function to fetch and display quizzes
         async function displayQuizzes() {
-            // Fetch available quizzes from backend API
             const response = await fetch('http://localhost:8080/quizzes');
             const quizzes = await response.json();
 
-            // Display each quiz as a clickable box
             const quizList = document.getElementById('quizList');
             quizzes.forEach(quiz => {
                 const quizBox = document.createElement('div');
@@ -46,14 +40,11 @@
                     </div>
                 `;
                 quizBox.addEventListener('click', () => {
-                    // Redirect to quiz page with quiz ID as parameter
                     window.location.href = `quiz.html?id=${quiz.id}`;
                 });
                 quizList.appendChild(quizBox);
             });
         }
-
-        // Call the displayQuizzes function when the page loads
         window.onload = displayQuizzes;
     </script>
 </body>
