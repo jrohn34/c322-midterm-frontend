@@ -13,7 +13,7 @@
         <input type="text" id="quizTitle" name="quizTitle" required><br><br>
 
         <div id="questionCheckboxes">
-            <!-- Question checkboxes will be dynamically populated here -->
+            <!-- Question checkboxes with image, ID, and options -->
         </div><br>
 
         <input type="button" value="Create Quiz" onclick="createQuiz()">
@@ -29,19 +29,46 @@
             // Populate the checkboxes with questions
             const questionCheckboxes = document.getElementById('questionCheckboxes');
             questions.forEach(question => {
+                // Create a container for each question
+                const questionContainer = document.createElement('div');
+
+                // Add image
+                const image = document.createElement('img');
+                image.src = `http://localhost:8080/questions/${question.id}/image`;
+                image.alt = 'Question Image';
+                image.style.width = '100px';
+                questionContainer.appendChild(image);
+
+                // Add question ID
+                const idLabel = document.createElement('label');
+                idLabel.textContent = `ID: ${question.id}`;
+                questionContainer.appendChild(idLabel);
+                questionContainer.appendChild(document.createElement('br'));
+
+                // Add question description
+                const descriptionLabel = document.createElement('label');
+                descriptionLabel.textContent = question.description;
+                questionContainer.appendChild(descriptionLabel);
+                questionContainer.appendChild(document.createElement('br'));
+
+                // Add options
+                question.choices.forEach((choice, index) => {
+                    const optionLabel = document.createElement('label');
+                    optionLabel.textContent = `${String.fromCharCode(65 + index)}. ${choice}`;
+                    questionContainer.appendChild(optionLabel);
+                    questionContainer.appendChild(document.createElement('br'));
+                });
+
+                // Create checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = 'selectedQuestions';
                 checkbox.value = question.id;
-                checkbox.id = `question${question.id}`;
-                
-                const label = document.createElement('label');
-                label.htmlFor = `question${question.id}`;
-                label.appendChild(document.createTextNode(question.description));
+                questionContainer.appendChild(checkbox);
 
-                questionCheckboxes.appendChild(checkbox);
-                questionCheckboxes.appendChild(label);
-                questionCheckboxes.appendChild(document.createElement('br'));
+                // Append question container to main container
+                questionCheckboxes.appendChild(questionContainer);
+                questionCheckboxes.appendChild(document.createElement('hr'));
             });
         }
 
