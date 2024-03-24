@@ -105,16 +105,21 @@
           });
       }
 
-      function calculateScore() {
-          score = 0;
-          for (let i = 0; i < quizData.questions.length; i++) {
-              const correctAnswer = quizData.questions[i].answer;
-              const userAnswer = userAnswers[i];
-              if (userAnswer && userAnswer.sort().join('') === correctAnswer.sort().join('')) {
-                  score++;
-              }
-          }
-      }
+      async function calculateScore() {
+        score = 0;
+        for (let i = 0; i < quizData.questions.length; i++) {
+          const question = quizData.questions[i];
+          const questionId = question.id;
+          const response = await fetch(`http://localhost:8080/questions/${questionId}`);
+          const data = await response.json();
+          const correctAnswer = data.answer;
+
+          const userAnswer = userAnswers[i];
+          if (userAnswer && userAnswer.sort().join('') === correctAnswer.sort().join('')) {
+            score++;
+        }
+    }
+}
 
       // Event listeners
       document.getElementById('next-btn').addEventListener('click', onNextClick);
