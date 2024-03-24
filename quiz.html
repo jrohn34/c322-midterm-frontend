@@ -1,11 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
 </head>
 <body>
-  
+    <h1>Quiz</h1>
+    <div id="quizContainer">
+        <!-- Questions and options will be dynamically populated here -->
+    </div>
+
+    <button onclick="submitQuiz()">Submit Quiz</button>
+
+    <script>
+        // Function to fetch quiz data from backend and display questions
+        async function displayQuiz() {
+            // Fetch quiz data from backend API
+            const response = await fetch('http://localhost:8080/quizzes/{quizId}');
+            const quiz = await response.json();
+
+            // Display the quiz title
+            const quizTitle = document.createElement('h2');
+            quizTitle.textContent = quiz.title;
+            document.getElementById('quizContainer').appendChild(quizTitle);
+
+            // Display each question in the quiz
+            quiz.questions.forEach((question, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.innerHTML = `
+                    <p>Question ${index + 1}: ${question.description}</p>
+                    <input type="radio" id="optionA" name="answer${index}" value="A">
+                    <label for="optionA">${question.choices[0]}</label><br>
+                    <input type="radio" id="optionB" name="answer${index}" value="B">
+                    <label for="optionB">${question.choices[1]}</label><br>
+                    <input type="radio" id="optionC" name="answer${index}" value="C">
+                    <label for="optionC">${question.choices[2]}</label><br><br>
+                `;
+                document.getElementById('quizContainer').appendChild(questionElement);
+            });
+        }
+
+        // Function to submit the quiz
+        function submitQuiz() {
+            // Implement quiz submission logic here
+            alert('Quiz submitted!');
+        }
+
+        // Call the displayQuiz function when the page loads
+        window.onload = displayQuiz;
+    </script>
 </body>
 </html>
