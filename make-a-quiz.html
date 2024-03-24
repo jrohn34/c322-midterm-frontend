@@ -12,36 +12,44 @@
         <label for="quizTitle">Quiz Title:</label><br>
         <input type="text" id="quizTitle" name="quizTitle" required><br><br>
 
-        <label for="selectedQuestions">Select Questions:</label><br>
-        <select id="selectedQuestions" name="selectedQuestions" multiple>
-            <!-- Populate with questions dynamically from backend -->
-        </select><br><br>
+        <div id="questionCheckboxes">
+            <!-- Question checkboxes will be dynamically populated here -->
+        </div><br>
 
         <input type="button" value="Create Quiz" onclick="createQuiz()">
     </form>
 
     <script>
-        // Function to fetch questions from backend and populate the select element
+        // Function to fetch questions from backend and populate the checkboxes
         async function populateQuestions() {
             // Fetch questions from backend API
             const response = await fetch('http://localhost:8080/questions');
             const questions = await response.json();
 
-            // Populate the select element with questions
-            const selectElement = document.getElementById('selectedQuestions');
+            // Populate the checkboxes with questions
+            const questionCheckboxes = document.getElementById('questionCheckboxes');
             questions.forEach(question => {
-                const option = document.createElement('option');
-                option.text = question.description;
-                option.value = question.id;
-                selectElement.appendChild(option);
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'selectedQuestions';
+                checkbox.value = question.id;
+                checkbox.id = `question${question.id}`;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `question${question.id}`;
+                label.appendChild(document.createTextNode(question.description));
+
+                questionCheckboxes.appendChild(checkbox);
+                questionCheckboxes.appendChild(label);
+                questionCheckboxes.appendChild(document.createElement('br'));
             });
         }
 
         // Function to create a quiz
         async function createQuiz() {
             const quizTitle = document.getElementById('quizTitle').value;
-            const selectedQuestions = Array.from(document.getElementById('selectedQuestions').selectedOptions)
-                .map(option => option.value);
+            const selectedQuestions = Array.from(document.querySelectorAll('input[name="selectedQuestions"]:checked'))
+                .map(checkbox => checkbox.value);
 
             // Send the quiz data to backend to create the quiz
             const response = await fetch('http://localhost:8080/quizzes', {
