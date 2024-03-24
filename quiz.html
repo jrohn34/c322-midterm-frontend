@@ -34,6 +34,8 @@
             quizContainer.innerHTML = `
                 <h2>Question ${index + 1}</h2>
                 <p>${question.description}</p>
+                <!-- Display image if available -->
+                ${question.image ? `<img src="${question.image}" alt="Question Image">` : ''}
                 <ul>
                     ${question.choices.map(choice => `<li>${choice}</li>`).join('')}
                 </ul>
