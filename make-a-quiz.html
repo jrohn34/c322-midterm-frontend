@@ -13,7 +13,7 @@
         <input type="text" id="quizTitle" name="quizTitle" required><br><br>
 
         <div id="questionCheckboxes">
-            <!-- Question checkboxes with image, ID, and options -->
+            <!-- Question checkboxes with image, ID, options, and answers -->
         </div><br>
 
         <input type="button" value="Create Quiz" onclick="createQuiz()">
@@ -59,11 +59,17 @@
                     questionContainer.appendChild(document.createElement('br'));
                 });
 
+                // Add answer
+                const answerLabel = document.createElement('label');
+                answerLabel.textContent = `Answer: ${question.answer}`;
+                questionContainer.appendChild(answerLabel);
+                questionContainer.appendChild(document.createElement('br'));
+
                 // Create checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = 'selectedQuestions';
-                checkbox.value = question.id;
+                checkbox.value = JSON.stringify({ id: question.id, answer: question.answer }); // Include both ID and answer
                 questionContainer.appendChild(checkbox);
 
                 // Append question container to main container
@@ -76,7 +82,11 @@
         async function createQuiz() {
             const quizTitle = document.getElementById('quizTitle').value;
             const selectedQuestions = Array.from(document.querySelectorAll('input[name="selectedQuestions"]:checked'))
-                .map(checkbox => checkbox.value);
+                .map(checkbox => JSON.parse(checkbox.value)); // Parse the JSON string
+
+            // Extract question IDs and answers
+            const questionIds = selectedQuestions.map(question => question.id);
+            const answers = selectedQuestions.map(question => question.answer);
 
             // Send the quiz data to backend to create the quiz
             const response = await fetch('http://localhost:8080/quizzes', {
@@ -86,7 +96,8 @@
                 },
                 body: JSON.stringify({
                     title: quizTitle,
-                    questionIds: selectedQuestions
+                    questionIds: questionIds,
+                    answers: answers // Include answers in the request body
                 })
             });
 
