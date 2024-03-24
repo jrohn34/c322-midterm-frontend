@@ -110,15 +110,27 @@
         for (let i = 0; i < quizData.questions.length; i++) {
           const question = quizData.questions[i];
           const questionId = question.id;
+
+          // Fetch the correct answer for the current question
           const response = await fetch(`http://localhost:8080/questions/${questionId}`);
           const data = await response.json();
           const correctAnswer = data.answer;
 
+          // Retrieve the user's answer for the current question
           const userAnswer = userAnswers[i];
-          if (userAnswer && userAnswer.sort().join('') === correctAnswer.sort().join('')) {
+          if (userAnswer && arraysEqual(userAnswer, correctAnswer)) {
             score++;
         }
     }
+}
+
+  // Function to check if two arrays are equal
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
 }
 
       // Event listeners
