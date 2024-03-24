@@ -15,16 +15,18 @@
 
     <button id="prev-btn">Previous</button>
     <button id="next-btn">Next</button>
+    <button id="submit-btn" style="display: none;">Submit</button> <!-- Initially hidden -->
 
     <script>
       let currentQuestionIndex = 0;
       let quizData;
       let score = 0;
-  
+      let userAnswers = []; // Array to store user's answers
+
       async function loadQuiz() {
           const urlParams = new URLSearchParams(window.location.search);
           const quizId = urlParams.get('id');
-  
+
           // Fetch quiz data from backend
           const response = await fetch(`http://localhost:8080/quizzes/${quizId}`);
           if (!response.ok) {
@@ -34,7 +36,7 @@
           quizData = await response.json();
           renderQuestion(currentQuestionIndex);
       }
-  
+
       function renderQuestion(index) {
           const question = quizData.questions[index];
           const quizContainer = document.getElementById('quiz-container');
@@ -52,49 +54,79 @@
               </form>
           `;
           updateButtonsVisibility();
+          loadUserAnswer(); // Load user's previous answer
       }
-  
+
       function updateButtonsVisibility() {
           const prevBtn = document.getElementById('prev-btn');
           const nextBtn = document.getElementById('next-btn');
           prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
           nextBtn.innerText = currentQuestionIndex === quizData.questions.length - 1 ? 'Submit' : 'Next';
       }
-  
+
       function onNextClick() {
+          saveUserAnswer(); // Save user's answer before navigating to the next question
           if (currentQuestionIndex < quizData.questions.length - 1) {
               currentQuestionIndex++;
               renderQuestion(currentQuestionIndex);
           } else {
-              calculateScore();
-              alert(`Quiz submitted! Your score: ${score}/${quizData.questions.length}`);
+              document.getElementById('submit-btn').style.display = 'block'; // Show the Submit button
+              document.getElementById('next-btn').style.display = 'none'; // Hide the Next button
           }
       }
-  
+
       function onPrevClick() {
+          saveUserAnswer(); // Save user's answer before navigating to the previous question
           if (currentQuestionIndex > 0) {
               currentQuestionIndex--;
               renderQuestion(currentQuestionIndex);
           }
       }
-  
-      function calculateScore() {
-          score = 0;
-          const answers = document.querySelectorAll('input[name="answer"]:checked');
-          answers.forEach(answer => {
-              const questionIndex = parseInt(answer.id.slice(6)) - 1;
-              const selectedAnswer = answer.value;
-              const correctAnswer = quizData.questions[questionIndex].answer;
-              if (selectedAnswer === correctAnswer) {
-                  score++;
+
+      function saveUserAnswer() {
+          const checkboxes = document.querySelectorAll('input[name="answer"]');
+          const selectedOptions = [];
+          checkboxes.forEach(checkbox => {
+              if (checkbox.checked) {
+                  selectedOptions.push(checkbox.value);
+              }
+          });
+          userAnswers[currentQuestionIndex] = selectedOptions;
+      }
+
+      function loadUserAnswer() {
+          const userAnswer = userAnswers[currentQuestionIndex];
+          if (!userAnswer) return; // No previous answer saved
+          const checkboxes = document.querySelectorAll('input[name="answer"]');
+          checkboxes.forEach(checkbox => {
+              if (userAnswer.includes(checkbox.value)) {
+                  checkbox.checked = true; // Check previously selected options
               }
           });
       }
-  
+
+      function calculateScore() {
+          score = 0;
+          for (let i = 0; i < quizData.questions.length; i++) {
+              const correctAnswer = quizData.questions[i].answer;
+              const userAnswer = userAnswers[i];
+              if (userAnswer && userAnswer.sort().join('') === correctAnswer.sort().join('')) {
+                  score++;
+              }
+          }
+      }
+
       // Event listeners
       document.getElementById('next-btn').addEventListener('click', onNextClick);
       document.getElementById('prev-btn').addEventListener('click', onPrevClick);
-  
+
+      // Submit button event listener
+      document.getElementById('submit-btn').addEventListener('click', function() {
+          saveUserAnswer(); // Save user's answer before submitting
+          calculateScore();
+          alert(`Quiz submitted! Your score: ${score}/${quizData.questions.length}`);
+      });
+
       // Load quiz when the page is loaded
       window.onload = loadQuiz;
   </script>
