@@ -3,52 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
+    <title>Take a Quiz</title>
+    <style>
+        /* Style for quiz boxes */
+        .quiz-box {
+            border: 2px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        /* Style for quiz info */
+        .quiz-info {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Quiz</h1>
-    <div id="quizContainer">
-        <!-- Questions and options will be dynamically populated here -->
+    <h2>Here are the list of all available quizzes. Click on a quiz to start taking the quiz.</h2>
+
+    <div id="quizList">
+        <!-- Quiz boxes will be dynamically added here -->
     </div>
 
-    <button onclick="submitQuiz()">Submit Quiz</button>
-
     <script>
-        // Function to fetch quiz data from backend and display questions
-        async function displayQuiz() {
-            // Fetch quiz data from backend API
-            const response = await fetch('http://localhost:8080/quizzes/{quizId}');
-            const quiz = await response.json();
+        // Function to fetch and display quizzes
+        async function displayQuizzes() {
+            // Fetch available quizzes from backend API
+            const response = await fetch('http://localhost:8080/quizzes');
+            const quizzes = await response.json();
 
-            // Display the quiz title
-            const quizTitle = document.createElement('h2');
-            quizTitle.textContent = quiz.title;
-            document.getElementById('quizContainer').appendChild(quizTitle);
-
-            // Display each question in the quiz
-            quiz.questions.forEach((question, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.innerHTML = `
-                    <p>Question ${index + 1}: ${question.description}</p>
-                    <input type="radio" id="optionA" name="answer${index}" value="A">
-                    <label for="optionA">${question.choices[0]}</label><br>
-                    <input type="radio" id="optionB" name="answer${index}" value="B">
-                    <label for="optionB">${question.choices[1]}</label><br>
-                    <input type="radio" id="optionC" name="answer${index}" value="C">
-                    <label for="optionC">${question.choices[2]}</label><br><br>
+            // Display each quiz as a clickable box
+            const quizList = document.getElementById('quizList');
+            quizzes.forEach(quiz => {
+                const quizBox = document.createElement('div');
+                quizBox.classList.add('quiz-box');
+                quizBox.innerHTML = `
+                    <div class="quiz-info">
+                        <p>Quiz ID: ${quiz.id}</p>
+                        <p>Title: ${quiz.title}</p>
+                        <p>Number of Questions: ${quiz.questions.length}</p>
+                    </div>
                 `;
-                document.getElementById('quizContainer').appendChild(questionElement);
+                quizBox.addEventListener('click', () => {
+                    // Redirect to quiz page with quiz ID as parameter
+                    window.location.href = `quiz.html?id=${quiz.id}`;
+                });
+                quizList.appendChild(quizBox);
             });
         }
 
-        // Function to submit the quiz
-        function submitQuiz() {
-            // Implement quiz submission logic here
-            alert('Quiz submitted!');
-        }
-
-        // Call the displayQuiz function when the page loads
-        window.onload = displayQuiz;
+        // Call the displayQuizzes function when the page loads
+        window.onload = displayQuizzes;
     </script>
 </body>
 </html>
