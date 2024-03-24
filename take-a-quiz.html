@@ -1,11 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take a Quiz</title>
+    <link rel="stylesheet" href="navbar.css">
+    <link rel="stylesheet" href="general.css">
+    <link rel="stylesheet" href="quiz.css">
 </head>
 <body>
-  
+    <ul class="topnav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="add-question.html">Add questions</a></li>
+        <li><a href="make-a-quiz.html">Create a quiz</a></li>
+        <li><a class="active" href="take-a-quiz.html">Take a quiz</a></li>
+        <li class="right"><a href="#about">About</a></li>
+    </ul>
+
+    <h2>Here are the list of all available quizzes. Click on a quiz to start taking the quiz.</h2>
+
+    <div id="quizList" class="quiz-list">
+        <!-- Quiz boxes will be dynamically added here -->
+    </div>
+
+    <script>
+        // Function to fetch and display quizzes
+        async function displayQuizzes() {
+            // Fetch available quizzes from backend API
+            const response = await fetch('http://localhost:8080/quizzes');
+            const quizzes = await response.json();
+
+            // Display each quiz as a clickable box
+            const quizList = document.getElementById('quizList');
+            quizzes.forEach(quiz => {
+                const quizBox = document.createElement('div');
+                quizBox.classList.add('quiz-box');
+                quizBox.textContent = quiz.title;
+                quizBox.addEventListener('click', () => {
+                    // Redirect to quiz page with quiz ID as parameter
+                    window.location.href = `quiz.html?id=${quiz.id}`;
+                });
+                quizList.appendChild(quizBox);
+            });
+        }
+
+        // Call the displayQuizzes function when the page loads
+        window.onload = displayQuizzes;
+    </script>
 </body>
 </html>
