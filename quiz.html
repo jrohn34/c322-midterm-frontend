@@ -17,86 +17,86 @@
     <button id="next-btn">Next</button>
 
     <script>
-        let currentQuestionIndex = 0;
-        let quizData;
-        let score = 0;
-
-        async function loadQuiz() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const quizId = urlParams.get('id');
-
-            // Fetch quiz data from backend
-            const response = await fetch(`http://localhost:8080/quizzes/${quizId}`);
-            if (!response.ok) {
-                alert('Failed to load quiz!');
-                return;
-            }
-            quizData = await response.json();
-            renderQuestion(currentQuestionIndex);
-        }
-
-        function renderQuestion(index) {
-            const question = quizData.questions[index];
-            const quizContainer = document.getElementById('quiz-container');
-            quizContainer.innerHTML = `
-                <h2>Question ${index + 1}</h2>
-                <img src="http://localhost:8080/questions/${question.id}/image" alt="Question Image" style="width: 100%;">
-                <p>${question.description}</p>
-                <form id="answer-form">
-                    <input type="checkbox" id="optionA" name="answer" value="A">
-                    <label for="optionA">${question.choices[0]}</label><br>
-                    <input type="checkbox" id="optionB" name="answer" value="B">
-                    <label for="optionB">${question.choices[1]}</label><br>
-                    <input type="checkbox" id="optionC" name="answer" value="C">
-                    <label for="optionC">${question.choices[2]}</label><br>
-                </form>
-            `;
-            updateButtonsVisibility();
-        }
-
-        function updateButtonsVisibility() {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
-            nextBtn.innerText = currentQuestionIndex === quizData.questions.length - 1 ? 'Submit' : 'Next';
-        }
-
-        function onNextClick() {
-            if (currentQuestionIndex < quizData.questions.length - 1) {
-                currentQuestionIndex++;
-                renderQuestion(currentQuestionIndex);
-            } else {
-                calculateScore();
-                alert(`Quiz submitted! Your score: ${score}/${quizData.questions.length}`);
-            }
-        }
-
-        function onPrevClick() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuestion(currentQuestionIndex);
-            }
-        }
-
-        function calculateScore() {
-            score = 0;
-            const answers = document.querySelectorAll('input[name="answer"]:checked');
-            answers.forEach(answer => {
-                const questionIndex = parseInt(answer.id.slice(6)) - 1;
-                const selectedAnswer = answer.value;
-                const correctAnswer = quizData.questions[questionIndex].answer;
-                if (selectedAnswer === correctAnswer) {
-                    score++;
-                }
-            });
-        }
-
-        // Event listeners
-        document.getElementById('next-btn').addEventListener('click', onNextClick);
-        document.getElementById('prev-btn').addEventListener('click', onPrevClick);
-
-        // Load quiz when the page is loaded
-        window.onload = loadQuiz;
-    </script>
+      let currentQuestionIndex = 0;
+      let quizData;
+      let score = 0;
+  
+      async function loadQuiz() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const quizId = urlParams.get('id');
+  
+          // Fetch quiz data from backend
+          const response = await fetch(`http://localhost:8080/quizzes/${quizId}`);
+          if (!response.ok) {
+              alert('Failed to load quiz!');
+              return;
+          }
+          quizData = await response.json();
+          renderQuestion(currentQuestionIndex);
+      }
+  
+      function renderQuestion(index) {
+          const question = quizData.questions[index];
+          const quizContainer = document.getElementById('quiz-container');
+          quizContainer.innerHTML = `
+              <h2>Question ${index + 1}</h2>
+              <img src="http://localhost:8080/questions/${question.id}/image" alt="Question Image" style="width: 100%;">
+              <p>${question.description}</p>
+              <form id="answer-form">
+                  <input type="checkbox" id="optionA" name="answer" value="A">
+                  <label for="optionA">${question.choices[0]}</label><br>
+                  <input type="checkbox" id="optionB" name="answer" value="B">
+                  <label for="optionB">${question.choices[1]}</label><br>
+                  <input type="checkbox" id="optionC" name="answer" value="C">
+                  <label for="optionC">${question.choices[2]}</label><br>
+              </form>
+          `;
+          updateButtonsVisibility();
+      }
+  
+      function updateButtonsVisibility() {
+          const prevBtn = document.getElementById('prev-btn');
+          const nextBtn = document.getElementById('next-btn');
+          prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
+          nextBtn.innerText = currentQuestionIndex === quizData.questions.length - 1 ? 'Submit' : 'Next';
+      }
+  
+      function onNextClick() {
+          if (currentQuestionIndex < quizData.questions.length - 1) {
+              currentQuestionIndex++;
+              renderQuestion(currentQuestionIndex);
+          } else {
+              calculateScore();
+              alert(`Quiz submitted! Your score: ${score}/${quizData.questions.length}`);
+          }
+      }
+  
+      function onPrevClick() {
+          if (currentQuestionIndex > 0) {
+              currentQuestionIndex--;
+              renderQuestion(currentQuestionIndex);
+          }
+      }
+  
+      function calculateScore() {
+          score = 0;
+          const answers = document.querySelectorAll('input[name="answer"]:checked');
+          answers.forEach(answer => {
+              const questionIndex = parseInt(answer.id.slice(6)) - 1;
+              const selectedAnswer = answer.value;
+              const correctAnswer = quizData.questions[questionIndex].answer;
+              if (selectedAnswer === correctAnswer) {
+                  score++;
+              }
+          });
+      }
+  
+      // Event listeners
+      document.getElementById('next-btn').addEventListener('click', onNextClick);
+      document.getElementById('prev-btn').addEventListener('click', onPrevClick);
+  
+      // Load quiz when the page is loaded
+      window.onload = loadQuiz;
+  </script>
 </body>
 </html>
