@@ -23,7 +23,13 @@
         async function loadQuiz() {
             const urlParams = new URLSearchParams(window.location.search);
             const quizId = urlParams.get('id');
+
+            // Fetch quiz data from backend
             const response = await fetch(`http://localhost:8080/quizzes/${quizId}`);
+            if (!response.ok) {
+                alert('Failed to load quiz!');
+                return;
+            }
             quizData = await response.json();
             renderQuestion(currentQuestionIndex);
         }
@@ -33,12 +39,16 @@
             const quizContainer = document.getElementById('quiz-container');
             quizContainer.innerHTML = `
                 <h2>Question ${index + 1}</h2>
+                <img src="http://localhost:8080/questions/${question.id}/image" alt="Question Image" style="width: 100%;">
                 <p>${question.description}</p>
-                <!-- Display image if available -->
-                ${question.image ? `<img src="${question.image}" alt="Question Image">` : ''}
-                <ul>
-                    ${question.choices.map(choice => `<li>${choice}</li>`).join('')}
-                </ul>
+                <form id="answer-form">
+                    <input type="checkbox" id="optionA" name="answer" value="A">
+                    <label for="optionA">${question.choices[0]}</label><br>
+                    <input type="checkbox" id="optionB" name="answer" value="B">
+                    <label for="optionB">${question.choices[1]}</label><br>
+                    <input type="checkbox" id="optionC" name="answer" value="C">
+                    <label for="optionC">${question.choices[2]}</label><br>
+                </form>
             `;
             updateButtonsVisibility();
         }
