@@ -35,7 +35,13 @@
             quizzes.forEach(quiz => {
                 const quizBox = document.createElement('div');
                 quizBox.classList.add('quiz-box');
-                quizBox.textContent = quiz.title;
+                quizBox.innerHTML = `
+                    <div class="quiz-info">
+                        <p>Quiz ID: ${quiz.id}</p>
+                        <p>Title: ${quiz.title}</p>
+                        <p>Number of Questions: ${quiz.questions.length}</p>
+                    </div>
+                `;
                 quizBox.addEventListener('click', () => {
                     // Redirect to quiz page with quiz ID as parameter
                     window.location.href = `quiz.html?id=${quiz.id}`;
